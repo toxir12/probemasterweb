@@ -1,0 +1,1750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MasterQuiz</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        :root {
+            /* Light mode (default) */
+            --app-bg-color: #f8f9fa;
+            --app-text-color: #212529;
+            --app-accent-color: #4361ee;
+            --app-accent-light: rgba(67, 97, 238, 0.1);
+            --app-card-bg: #ffffff;
+            --app-card-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+            --app-secondary-bg: #f1f3f9;
+            --app-border-color: rgba(0, 0, 0, 0.1);
+            --app-success-color: #38b000;
+            --app-warning-color: #f48c06;
+            --app-danger-color: #e63946;
+            --app-gradient: linear-gradient(135deg, #4361ee, #3a0ca3);
+            --app-option-hover: #f1f3f9;
+            --app-progress-bg: rgba(0, 0, 0, 0.1);
+            --app-result-circle-bg: #f1f3f9;
+        }
+
+        [data-theme="dark"] {
+            /* Dark mode */
+            --app-bg-color: #121212;
+            --app-text-color: #e0e0e0;
+            --app-accent-color: #4cc9f0;
+            --app-accent-light: rgba(76, 201, 240, 0.1);
+            --app-card-bg: #1e1e1e;
+            --app-card-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            --app-secondary-bg: #2d2d2d;
+            --app-border-color: rgba(255, 255, 255, 0.1);
+            --app-success-color: #2dc653;
+            --app-warning-color: #ffaa00;
+            --app-danger-color: #ff5c5c;
+            --app-gradient: linear-gradient(135deg, #4cc9f0, #3a0ca3);
+            --app-option-hover: #2d2d2d;
+            --app-progress-bg: rgba(255, 255, 255, 0.1);
+            --app-result-circle-bg: #2d2d2d;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: var(--app-bg-color);
+            color: var(--app-text-color);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+
+        .container {
+            max-width: 100%;
+            padding: 16px;
+        }
+
+        .app-header {
+            position: relative;
+            padding: 20px 0;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .app-logo {
+            font-size: 28px;
+            font-weight: 700;
+            background: var(--app-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
+            display: inline-block;
+        }
+
+        .theme-toggle {
+            position: absolute;
+            right: 10px;
+            top: 20px;
+            background: none;
+            border: none;
+            color: var(--app-text-color);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            background-color: var(--app-accent-light);
+        }
+
+        .card {
+            background-color: var(--app-card-bg);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: none;
+            box-shadow: var(--app-card-shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-title {
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--app-accent-color);
+        }
+
+        .btn-primary {
+            background: var(--app-gradient);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 12px 20px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(67, 97, 238, 0.4);
+        }
+
+        .btn-outline-primary {
+            background: transparent;
+            color: var(--app-accent-color);
+            border: 2px solid var(--app-accent-color);
+            border-radius: 12px;
+            padding: 12px 20px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-primary:hover {
+            background-color: var(--app-accent-light);
+            transform: translateY(-2px);
+        }
+
+        .option-button {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 15px 20px;
+            margin-bottom: 12px;
+            border-radius: 12px;
+            background-color: var(--app-card-bg);
+            color: var(--app-text-color);
+            border: 1px solid var(--app-border-color);
+            transition: all 0.3s ease;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option-button:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--app-gradient);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .option-button:hover, .option-button:focus {
+            background-color: var(--app-option-hover);
+            transform: translateX(5px);
+        }
+
+        .option-button:hover:before {
+            opacity: 1;
+        }
+
+        .option-button.selected {
+            background: var(--app-gradient);
+            color: white;
+            border: none;
+            transform: translateX(0);
+        }
+
+        .option-button.selected:before {
+            opacity: 0;
+        }
+
+        .quiz-progress {
+            height: 8px;
+            margin-bottom: 25px;
+            background-color: var(--app-progress-bg);
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .quiz-progress-bar {
+            height: 100%;
+            background: var(--app-gradient);
+            transition: width 0.5s ease;
+            border-radius: 4px;
+        }
+
+        .quiz-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .quiz-info .timer {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .quiz-info .timer i {
+            color: var(--app-warning-color);
+        }
+
+        .result-circle {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: conic-gradient(var(--app-accent-color) 0%, var(--app-accent-color) var(--percentage), var(--app-result-circle-bg) var(--percentage), var(--app-result-circle-bg) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .result-circle::after {
+            content: '';
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background-color: var(--app-card-bg);
+        }
+
+        .result-percentage {
+            position: relative;
+            z-index: 1;
+            font-size: 40px;
+            font-weight: bold;
+            color: var(--app-accent-color);
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .loading {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: var(--app-bg-color);
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--app-accent-light);
+            border-top-color: var(--app-accent-color);
+            border-radius: 50%;
+            animation: spinner 1s linear infinite;
+        }
+
+        .loading-text {
+            margin-top: 20px;
+            font-weight: 600;
+            color: var(--app-accent-color);
+        }
+
+        @keyframes spinner {
+            to {transform: rotate(360deg);}
+        }
+
+        #app {
+            display: none;
+        }
+
+        .alert-info {
+            background-color: var(--app-accent-light);
+            color: var(--app-accent-color);
+            border: none;
+            border-radius: 12px;
+            padding: 15px 20px;
+        }
+
+        .badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-weight: 500;
+            font-size: 0.8rem;
+            margin-right: 5px;
+        }
+
+        .badge-primary {
+            background-color: var(--app-accent-light);
+            color: var(--app-accent-color);
+        }
+
+        .test-stats {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .test-difficulty {
+            display: flex;
+            margin-top: 5px;
+        }
+
+        .difficulty-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--app-accent-light);
+            margin-right: 3px;
+        }
+
+        .difficulty-active {
+            background-color: var(--app-accent-color);
+        }
+
+        .result-message {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin: 20px 0;
+            text-align: center;
+            color: var(--app-text-color);
+            background-color: var(--app-card-bg);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: var(--app-card-shadow);
+        }
+        
+        .result-header h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--app-accent-color);
+            text-align: center;
+        }
+        
+        .result-details {
+            text-align: left;
+        }
+        
+        .result-details p {
+            margin: 10px 0;
+            font-size: 1.1rem;
+        }
+        
+        .result-details code {
+            background-color: var(--app-secondary-bg);
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+            color: var(--app-accent-color);
+        }
+        
+        .result-motivation {
+            margin-top: 20px !important;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1.2rem !important;
+            color: var(--app-accent-color);
+        }
+
+        .result-stats {
+            text-align: center;
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+        }
+
+        .direct-access-message {
+            background-color: var(--app-card-bg);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: var(--app-card-shadow);
+            max-width: 500px;
+            margin: 50px auto;
+        }
+
+        .direct-access-message h2 {
+            color: var(--app-accent-color);
+            margin-bottom: 20px;
+        }
+
+        .direct-access-steps {
+            margin: 20px 0;
+            padding-left: 20px;
+        }
+
+        .direct-access-steps li {
+            margin-bottom: 10px;
+            position: relative;
+            padding-left: 10px;
+        }
+
+        .direct-access-steps li:before {
+            content: '';
+            position: absolute;
+            left: -15px;
+            top: 8px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--app-accent-color);
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .animate-slide-up {
+            animation: slideUp 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div id="direct-access-message" style="display: none;" class="direct-access-message animate-fade-in">
+        <h2 id="direct-access-title">MasterQuiz Telegram App</h2>
+        <div class="alert alert-info">
+            <p><strong id="direct-access-message-text">This web app is designed to work within Telegram only.</strong></p>
+            <p id="direct-access-instructions">To use this app:</p>
+            <ol class="direct-access-steps">
+                <li id="direct-access-step1">Open the MasterQuiz bot in Telegram</li>
+                <li id="direct-access-step2">Click on the "📱 Web Quiz App" button in the menu</li>
+                <li id="direct-access-step3">Tap the "Open Quiz App" button that appears</li>
+            </ol>
+        </div>
+        <p id="direct-access-developer">If you're a developer testing this app, you need to simulate the Telegram WebApp environment.</p>
+    </div>
+
+    <div id="loading" class="loading">
+        <div class="loading-spinner"></div>
+        <div id="loading-text" class="loading-text">Loading MasterQuiz...</div>
+    </div>
+
+    <div id="app" class="container animate-fade-in">
+        <!-- App Header with Theme Toggle -->
+        <div class="app-header">
+            <div class="app-logo" id="app-name">MasterQuiz</div>
+            <button id="theme-toggle" class="theme-toggle">
+                <i class="bi bi-sun-fill" id="light-icon"></i>
+                <i class="bi bi-moon-fill" id="dark-icon" style="display: none;"></i>
+            </button>
+        </div>
+        
+        <!-- Home Screen -->
+        <div id="home-screen" class="animate-slide-up">
+            <p class="mb-4" id="welcome-text">Welcome to MasterQuiz! Choose a test to start solving.</p>
+            <div id="tests-list" class="mb-4">
+                <!-- Tests will be loaded here -->
+            </div>
+        </div>
+        
+        <!-- Test Configuration Screen -->
+        <div id="test-config-screen" style="display: none;" class="animate-slide-up">
+            <h3 id="config-test-title">Configure Test</h3>
+            <div class="config-container">
+                <div class="form-group mb-4">
+                    <label id="question-range-label" for="start-question">Question Range</label>
+                    <div class="d-flex align-items-center">
+                        <input type="number" id="start-question" class="form-control me-2" min="1" value="1">
+                        <span class="mx-2">to</span>
+                        <input type="number" id="end-question" class="form-control ms-2" min="1" value="10">
+                    </div>
+                    <small id="question-range-help" class="form-text text-muted">Select which questions to include in the test</small>
+                </div>
+                
+                <div class="form-group mb-4">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="shuffle-questions" checked>
+                        <label class="form-check-label" id="shuffle-questions-label" for="shuffle-questions">
+                            Shuffle questions
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="form-group mb-4">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="shuffle-answers" checked>
+                        <label class="form-check-label" id="shuffle-answers-label" for="shuffle-answers">
+                            Shuffle answer options
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between mt-4">
+                    <button id="back-to-tests-btn" class="btn btn-secondary" onclick="showScreen(document.getElementById('home-screen'))">Back</button>
+                    <button id="start-configured-test-btn" class="btn btn-primary" onclick="startConfiguredTest()">Start Test</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quiz Screen -->
+        <div id="quiz-screen" style="display: none;" class="animate-slide-up">
+            <div class="quiz-header">
+                <h3 id="quiz-title">Test Title</h3>
+                <div class="quiz-timer">
+                    <i class="bi bi-alarm"></i>
+                    <span id="timer-label" class="me-1">Time</span>
+                    <span id="timer">00:00</span>
+                </div>
+            </div>
+            
+            <div class="question-container">
+                <div class="question-header">
+                    <span class="question-number"><span id="question-label">Question</span> <span id="current-question">1</span>/<span id="total-questions">10</span></span>
+                    <div class="progress">
+                        <div id="progress-bar" class="progress-bar" role="progressbar" style="width: 10%" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+                
+                <div id="question-text" class="question-text">Question text goes here?</div>
+                
+                <div id="answers" class="answers">
+                    <!-- Answers will be loaded here -->
+                </div>
+                
+                <div class="quiz-navigation">
+                    <button id="prev-btn" class="btn btn-secondary">Previous</button>
+                    <button id="next-btn" class="btn btn-primary">Next</button>
+                    <button id="finish-btn" class="btn btn-success" style="display: none;">Finish</button>
+                </div>
+                <div class="mt-3 text-center">
+                    <button id="stop-test-btn" class="btn btn-danger" onclick="stopTest()">Stop Test</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Results Screen -->
+        <div id="results-screen" style="display: none;" class="animate-slide-up">
+            <h3 id="results-title">Quiz Results</h3>
+            
+            <div class="results-container">
+                <div class="results-circle">
+                    <div class="results-score">
+                        <span id="you-scored-text">You scored</span>
+                        <span id="score">0</span><span id="score-separator">/</span><span id="max-score">0</span>
+                    </div>
+                </div>
+                
+                <div id="results-message" class="results-message">You did great!</div>
+                
+                <div class="results-actions">
+                    <button id="review-btn" class="btn btn-primary">Review Answers</button>
+                    <button id="home-btn" class="btn btn-secondary">Back to Home</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Translations embedded directly in the HTML file
+        const translations = {
+                // Uzbek translations
+                uz: {
+                    // General
+                    appName: "MasterQuiz",
+                    loading: "MasterQuiz yuklanmoqda...",
+                    welcome: "MasterQuiz-ga xush kelibsiz! Yechish uchun testni tanlang.",
+                    configureTest: "Testni sozlash",
+                    noTests: "Sizda hech qanday test yo'q.",
+                    createTestInstructions: "Test yaratish uchun asosiy Telegram botdan foydalaning va ular bu yerda paydo bo'ladi.",
+                    
+                    // Buttons
+                    startTest: "Testni boshlash",
+                    next: "Keyingi",
+                    previous: "Oldingi",
+                    finish: "Tugatish",
+                    stopTest: "Testni to'xtatish",
+                    review: "Javoblarni ko'rish",
+                    backToHome: "Bosh sahifaga",
+                    back: "Orqaga",
+                    
+                    // Quiz
+                    question: "Savol",
+                    time: "Vaqt",
+                    youScored: "Siz to'pladingiz",
+                    questionRange: "Savollar oralig'i",
+                    questionRangeHelp: "Testga qaysi savollarni kiritishni tanlang",
+                    shuffleQuestions: "Savollarni aralashtirish",
+                    shuffleAnswers: "Javoblarni aralashtirish",
+                    
+                    // Messages
+                    noTests: "Sizda hali testlar yo'q. Avval botda test yarating.",
+                    excellent: "Ajoyib! Siz juda yaxshi bajardingiz!",
+                    goodJob: "Yaxshi ish! Barakalla!",
+                    notBad: "Yomon emas, lekin yaxshiroq bo'lishi mumkin!",
+                    needPractice: "Sizga ko'proq mashq qilish kerak!",
+                    stopConfirm: "Testni to'xtatishni xohlaysizmi? Sizning natijalaringiz yo'qoladi.",
+                    directAccessInstructions: "Ilovadan foydalanish uchun:",
+                    directAccessStep1: "Telegramda MasterQuiz botini oching",
+                    directAccessStep2: "Menyuda \"📱 Web Quiz App\" tugmasini bosing",
+                    directAccessStep3: "Paydo bo'lgan \"Open Quiz App\" tugmasini bosing",
+                    directAccessDeveloper: "Agar siz dasturchi bo'lsangiz, Telegram WebApp muhitini simulyatsiya qilishingiz kerak."
+                },
+                
+                // Russian translations
+                ru: {
+                    // General
+                    appName: "MasterQuiz",
+                    loading: "Загрузка MasterQuiz...",
+                    welcome: "Добро пожаловать в MasterQuiz! Выберите тест для решения.",
+                    configureTest: "Настроить тест",
+                    noTests: "У вас нет тестов.",
+                    createTestInstructions: "Чтобы создать тесты, используйте основного Telegram бота, и они появятся здесь.",
+                    
+                    // Buttons
+                    startTest: "Начать тест",
+                    next: "Следующий",
+                    previous: "Предыдущий",
+                    finish: "Завершить",
+                    stopTest: "Остановить тест",
+                    review: "Просмотреть ответы",
+                    backToHome: "На главную",
+                    back: "Назад",
+                    
+                    // Quiz
+                    question: "Вопрос",
+                    time: "Время",
+                    youScored: "Вы набрали",
+                    questionRange: "Диапазон вопросов",
+                    questionRangeHelp: "Выберите, какие вопросы включить в тест",
+                    shuffleQuestions: "Перемешать вопросы",
+                    shuffleAnswers: "Перемешать варианты ответов",
+                    
+                    // Messages
+                    noTests: "У вас еще нет тестов. Сначала создайте тест в боте.",
+                    excellent: "Отлично! Вы справились великолепно!",
+                    goodJob: "Хорошая работа! Молодец!",
+                    notBad: "Неплохо, но вы можете лучше!",
+                    needPractice: "Вам нужно больше практики!",
+                    stopConfirm: "Вы уверены, что хотите остановить тест? Ваш прогресс будет потерян.",
+                    directAccessInstructions: "Чтобы использовать это приложение:",
+                    directAccessStep1: "Откройте бот MasterQuiz в Telegram",
+                    directAccessStep2: "Нажмите кнопку \"📱 Web Quiz App\" в меню",
+                    directAccessStep3: "Нажмите кнопку \"Open Quiz App\", которая появится",
+                    directAccessDeveloper: "Если вы разработчик, тестирующий это приложение, вам нужно симулировать среду Telegram WebApp."
+                },
+                
+                // English (default) translations
+                en: {
+                    // General
+                    appName: "MasterQuiz",
+                    loading: "Loading MasterQuiz...",
+                    welcome: "Welcome to MasterQuiz! Choose a test to start solving.",
+                    configureTest: "Configure Test",
+                    
+                    // Buttons
+                    startTest: "Start Test",
+                    next: "Next",
+                    previous: "Previous",
+                    finish: "Finish",
+                    stopTest: "Stop Test",
+                    review: "Review Answers",
+                    backToHome: "Back to Home",
+                    back: "Back",
+                    
+                    // Quiz
+                    question: "Question",
+                    time: "Time",
+                    youScored: "You scored",
+                    questionRange: "Question Range",
+                    questionRangeHelp: "Select which questions to include in the test",
+                    shuffleQuestions: "Shuffle questions",
+                    shuffleAnswers: "Shuffle answer options",
+                    
+                    // Messages
+                    noTests: "You don't have any tests yet. Create a test in the bot first.",
+                    excellent: "Excellent! You did great!",
+                    goodJob: "Good job! Well done!",
+                    notBad: "Not bad, but you can do better!",
+                    needPractice: "You need more practice!",
+                    stopConfirm: "Are you sure you want to stop the test? Your progress will be lost.",
+                    directAccessTitle: "MasterQuiz Telegram App",
+                    directAccessMessage: "This web app is designed to work within Telegram only.",
+                    directAccessInstructions: "To use this app:",
+                    directAccessStep1: "Open the MasterQuiz bot in Telegram",
+                    directAccessStep2: "Click on the \"📱 Web Quiz App\" button in the menu",
+                    directAccessStep3: "Tap the \"Open Quiz App\" button that appears",
+                    directAccessDeveloper: "If you're a developer testing this app, you need to simulate the Telegram WebApp environment."
+                }
+            };
+    </script>
+    <script>
+        // Check if we're in a Telegram WebApp environment
+        if (!window.Telegram || !window.Telegram.WebApp) {
+            // Not running in Telegram WebApp - show message and hide app
+            document.getElementById('direct-access-message').style.display = 'block';
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('app').style.display = 'none';
+            // Exit early - don't execute the rest of the script
+            throw new Error('This app can only be accessed through Telegram');
+        }
+        
+        // DOM elements
+        const app = document.getElementById('app');
+        const loadingScreen = document.getElementById('loading');
+        const directAccessMessage = document.getElementById('direct-access-message');
+        const homeScreen = document.getElementById('home-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const resultsScreen = document.getElementById('results-screen');
+        const testsList = document.getElementById('tests-list');
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('answers');
+        const currentQuestionElement = document.getElementById('current-question');
+        const totalQuestionsElement = document.getElementById('total-questions');
+        const totalQuestionsResultElement = document.getElementById('total-questions-result');
+        const correctAnswersElement = document.getElementById('correct-answers');
+        const resultMessageElement = document.getElementById('result-message');
+        const resultPercentageElement = document.querySelector('.result-percentage');
+        const resultCircleElement = document.querySelector('.result-circle');
+        const progressBar = document.getElementById('progress-bar');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const reviewBtn = document.getElementById('review-btn');
+        const homeBtn = document.getElementById('home-btn');
+        const timerElement = document.getElementById('timer');
+
+        // App state
+        let currentUser = null;
+        let tests = [];
+        let currentTest = null;
+        let currentQuestionIndex = 0;
+        let userAnswers = [];
+        let startTime = 0;
+        let timerInterval = null;
+        let currentLanguage = 'en'; // Default language
+        
+        // Language functions
+        function initializeLanguage() {
+            // Get language from URL parameter
+            const urlParams = new URLSearchParams(window.location.search);
+            const langParam = urlParams.get('lang');
+            
+            // Set language (default to 'en' if not specified or invalid)
+            if (langParam && ['uz', 'ru', 'en'].includes(langParam)) {
+                currentLanguage = langParam;
+            } else if (window.Telegram && window.Telegram.WebApp) {
+                // Try to get language from Telegram if available
+                const tg = window.Telegram.WebApp;
+                if (tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.language_code) {
+                    const userLang = tg.initDataUnsafe.user.language_code;
+                    if (['uz', 'ru'].includes(userLang)) {
+                        currentLanguage = userLang;
+                    }
+                }
+            }
+            
+            console.log('Using language:', currentLanguage);
+            updateUILanguage();
+        }
+        
+        function updateUILanguage() {
+            const t = translations[currentLanguage];
+            if (!t) {
+                console.error('Translation not found for language:', currentLanguage);
+                return;
+            }
+            
+            // Update direct access message
+            document.getElementById('direct-access-title').textContent = t.directAccessTitle;
+            document.getElementById('direct-access-message-text').textContent = t.directAccessMessage;
+            document.getElementById('direct-access-instructions').textContent = t.directAccessInstructions;
+            document.getElementById('direct-access-step1').textContent = t.directAccessStep1;
+            document.getElementById('direct-access-step2').textContent = t.directAccessStep2;
+            document.getElementById('direct-access-step3').textContent = t.directAccessStep3;
+            document.getElementById('direct-access-developer').textContent = t.directAccessDeveloper;
+            
+            // Update loading screen
+            document.getElementById('loading-text').textContent = t.loading;
+            
+            // Update app header
+            document.getElementById('app-name').textContent = t.appName;
+            
+            // Update home screen
+            document.getElementById('welcome-text').textContent = t.welcome;
+            
+            // Update no tests message if present
+            const noTestsAlert = document.querySelector('#tests-list .alert-info');
+            if (noTestsAlert) {
+                noTestsAlert.textContent = t.noTests;
+            }
+            
+            // Update buttons
+            document.querySelectorAll('.start-test-btn').forEach(btn => {
+                btn.textContent = t.startTest;
+            });
+            
+            // Update quiz screen if visible
+            if (document.getElementById('timer-label')) {
+                document.getElementById('timer-label').textContent = t.timer;
+            }
+            if (document.getElementById('question-label')) {
+                document.getElementById('question-label').textContent = t.question;
+            }
+            if (document.getElementById('prev-btn')) {
+                document.getElementById('prev-btn').textContent = t.previous;
+            }
+            if (document.getElementById('next-btn')) {
+                document.getElementById('next-btn').textContent = t.next;
+            }
+            if (document.getElementById('finish-btn')) {
+                document.getElementById('finish-btn').textContent = t.finish;
+            }
+            
+            // Update results screen if visible
+            if (document.getElementById('results-title')) {
+                document.getElementById('results-title').textContent = t.quizResults;
+            }
+            if (document.getElementById('review-btn')) {
+                document.getElementById('review-btn').textContent = t.reviewAnswers;
+            }
+            if (document.getElementById('home-btn')) {
+                document.getElementById('home-btn').textContent = t.backToHome;
+            }
+        }
+
+        // Initialize the app
+        async function initApp() {
+            try {
+                console.log('Initializing app...');
+                console.log('Telegram WebApp available:', !!window.Telegram?.WebApp);
+                
+                if (!window.Telegram || !window.Telegram.WebApp) {
+                    throw new Error('Telegram WebApp is not available');
+                }
+                
+                // Initialize theme based on Telegram or system preference
+                initializeTheme();
+                
+                // Initialize language based on URL parameter or Telegram settings
+                initializeLanguage();
+                
+                // Get the user from Telegram WebApp
+                const tg = window.Telegram.WebApp;
+                tg.expand();
+                
+                // Try to get user from Telegram WebApp
+                if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                    currentUser = tg.initDataUnsafe.user;
+                    console.log('Got user from Telegram WebApp:', currentUser);
+                } else {
+                    // Fallback to default user if Telegram doesn't provide user data
+                    currentUser = { id: 1477944238, username: 'default_user', first_name: 'Default' };
+                    console.log('Using default user:', currentUser);
+                }
+                
+                // Load user's tests
+                await loadTests();
+                
+                // Hide loading, show app
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('app').style.display = 'block';
+                
+                // Show home screen
+                showScreen(homeScreen);
+            } catch (error) {
+                console.error('Initialization error:', error);
+                alert('Failed to initialize the app: ' + error.message);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('direct-access-message').style.display = 'block';
+            }
+        }
+
+        // Load user's tests
+        async function loadTests() {
+            try {
+                if (!currentUser || !currentUser.id) {
+                    console.error('No authenticated user found');
+                    showScreen('login-screen');
+                    return;
+                }
+                
+                console.log('Loading tests for user:', currentUser.id);
+                
+                // First, force a sync with the main bot's tests
+                console.log('Syncing tests with main bot...');
+                try {
+                    const syncResponse = await fetch('/api/sync');
+                    const syncData = await syncResponse.json();
+                    console.log('Sync response:', syncData);
+                } catch (syncError) {
+                    console.error('Error syncing tests:', syncError);
+                    // Continue even if sync fails
+                }
+                
+                // Only use the session-based authentication
+                // No query parameters for security reasons
+                const url = '/api/tests';
+                console.log('Fetching tests from:', url);
+                
+                const response = await fetch(url);
+                const data = await response.json();
+                console.log('Tests API response:', data);
+                
+                if (!data.success) {
+                    throw new Error(data.message || 'Failed to load tests');
+                }
+                
+                tests = data.tests || [];
+                console.log(`Loaded ${tests.length} tests for user ${userId}`);
+                
+                // Display a message if no tests are found
+                if (tests.length === 0) {
+                    console.log('No tests found for this user');
+                    
+                    // Show a message in the UI
+                    const testsList = document.getElementById('tests-list');
+                    testsList.innerHTML = `
+                        <div class="alert alert-info">
+                            ${t.noTests}
+                        </div>
+                        <div class="alert alert-secondary">
+                            ${t.createTestInstructions || 'To create tests, use the main Telegram bot and they will appear here.'}
+                        </div>
+                    `;
+                }
+                
+                // Make sure we have valid test data
+                tests.forEach((test, index) => {
+                    // Ensure test has an ID
+                    if (!test.id) {
+                        test.id = `test_${index}`;
+                    }
+                    
+                    // Ensure test has a name
+                    if (!test.name) {
+                        test.name = `Test ${index + 1}`;
+                    }
+                    
+                    // Ensure test has questions array
+                    if (!test.questions || !Array.isArray(test.questions)) {
+                        test.questions = [];
+                    }
+                    
+                    // Normalize question format
+                    test.questions.forEach((question, qIndex) => {
+                        // Handle different question formats
+                        if (question.text && !question.question) {
+                            question.question = question.text;
+                        }
+                        
+                        if (!question.options || !Array.isArray(question.options)) {
+                            question.options = [];
+                        }
+                    });
+                });
+                
+                renderTestsList();
+            } catch (error) {
+                console.error('Error loading tests:', error);
+                alert('Failed to load tests: ' + error.message);
+            }
+        }
+
+        // Theme toggle functionality
+        function initializeTheme() {
+            console.log('Initializing theme...');
+            const themeToggleBtn = document.getElementById('theme-toggle');
+            
+            if (!themeToggleBtn) {
+                console.error('Theme toggle button not found!');
+                return;
+            }
+            
+            // Get references to the icons
+            const lightIcon = document.getElementById('light-icon');
+            const darkIcon = document.getElementById('dark-icon');
+            
+            if (!lightIcon || !darkIcon) {
+                console.error('Theme icons not found!');
+                return;
+            }
+            
+            const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            // Check if Telegram has a color scheme preference
+            let initialTheme = 'light';
+            if (window.Telegram && window.Telegram.WebApp) {
+                const tg = window.Telegram.WebApp;
+                if (tg.colorScheme === 'dark') {
+                    initialTheme = 'dark';
+                }
+            } else if (prefersDarkScheme) {
+                initialTheme = 'dark';
+            }
+            
+            console.log('Initial theme:', initialTheme);
+            
+            // Set initial theme
+            if (initialTheme === 'dark') {
+                document.body.setAttribute('data-theme', 'dark');
+                lightIcon.style.display = 'none';
+                darkIcon.style.display = 'block';
+            } else {
+                document.body.removeAttribute('data-theme');
+                lightIcon.style.display = 'block';
+                darkIcon.style.display = 'none';
+            }
+            
+            // Add event listener to theme toggle button
+            themeToggleBtn.addEventListener('click', () => {
+                console.log('Theme toggle clicked');
+                const currentTheme = document.body.getAttribute('data-theme');
+                
+                if (currentTheme === 'dark') {
+                    // Switch to light theme
+                    document.body.removeAttribute('data-theme');
+                    lightIcon.style.display = 'block';
+                    darkIcon.style.display = 'none';
+                    localStorage.setItem('theme', 'light');
+                    console.log('Switched to light theme');
+                } else {
+                    // Switch to dark theme
+                    document.body.setAttribute('data-theme', 'dark');
+                    lightIcon.style.display = 'none';
+                    darkIcon.style.display = 'block';
+                    localStorage.setItem('theme', 'dark');
+                    console.log('Switched to dark theme');
+                }
+            });
+            
+            // Check for saved theme preference in localStorage
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                console.log('Found saved theme preference:', savedTheme);
+                if (savedTheme === 'dark') {
+                    document.body.setAttribute('data-theme', 'dark');
+                    lightIcon.style.display = 'none';
+                    darkIcon.style.display = 'block';
+                } else {
+                    document.body.removeAttribute('data-theme');
+                    lightIcon.style.display = 'block';
+                    darkIcon.style.display = 'none';
+                }
+            }
+            
+            console.log('Theme initialization complete');
+        }
+
+        // Render tests list with enhanced UI
+        function renderTestsList() {
+            testsList.innerHTML = '';
+            
+            if (!tests || tests.length === 0) {
+                testsList.innerHTML = '<div class="alert alert-info">You don\'t have any tests yet. Create a test in the bot first.</div>';
+                return;
+            }
+            
+            tests.forEach((test, index) => {
+                // Make sure test has required properties
+                if (!test.name) {
+                    test.name = 'Unnamed Test';
+                }
+                
+                if (!test.questions) {
+                    test.questions = [];
+                }
+                
+                if (!test.id) {
+                    test.id = `test_${Math.random().toString(36).substr(2, 9)}`;
+                }
+                
+                // Calculate a difficulty level (1-5) based on number of questions
+                const questionCount = test.questions.length;
+                const difficulty = Math.min(5, Math.max(1, Math.ceil(questionCount / 5)));
+                
+                // Create difficulty dots
+                let difficultyDots = '';
+                for (let i = 1; i <= 5; i++) {
+                    difficultyDots += `<div class="difficulty-dot ${i <= difficulty ? 'difficulty-active' : ''}"></div>`;
+                }
+                
+                const testCard = document.createElement('div');
+                testCard.className = 'card animate-fade-in';
+                testCard.style.animationDelay = `${index * 0.1}s`;
+                testCard.innerHTML = `
+                    <h5 class="card-title">${test.name}</h5>
+                    <div class="test-stats">
+                        <span class="badge badge-primary">${test.questions.length} questions</span>
+                        <span class="badge badge-primary">~${Math.ceil(test.questions.length * 30 / 60)} min</span>
+                    </div>
+                    <div class="test-difficulty">${difficultyDots}</div>
+                    <button class="btn btn-primary start-test-btn mt-3" data-test-id="${test.id}">
+                        <i class="bi bi-play-fill"></i> Start Test
+                    </button>
+                `;
+                testsList.appendChild(testCard);
+            });
+            
+            // Add event listeners to start test buttons
+            document.querySelectorAll('.start-test-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const testId = this.getAttribute('data-test-id');
+                    console.log('Start test button clicked for test ID:', testId);
+                    startTest(testId);
+                });
+            });
+        }
+
+        // Start test configuration
+        function startTest(testId) {
+            console.log('Configuring test with ID:', testId);
+            currentTest = tests.find(test => test.id == testId);
+            
+            if (!currentTest) {
+                alert('Test not found');
+                return;
+            }
+            
+            // Verify the test belongs to the current user
+            if (currentTest.owner_id && currentTest.owner_id !== String(currentUser.id)) {
+                console.error(`Test with ID ${testId} does not belong to the current user`);
+                alert(t.testNotFound || 'Test not found');
+                return;
+            }
+            
+            // Set up configuration screen
+            document.getElementById('config-test-title').textContent = `Configure: ${currentTest.name}`;
+            
+            // Set end question to total number of questions
+            const totalQuestions = currentTest.questions.length;
+            document.getElementById('end-question').value = totalQuestions;
+            document.getElementById('end-question').max = totalQuestions;
+            document.getElementById('start-question').max = totalQuestions;
+            document.getElementById('start-question').value = 1;
+            
+            // Make sure the configuration screen is visible
+            const configScreen = document.getElementById('test-config-screen');
+            document.getElementById('home-screen').style.display = 'none';
+            document.getElementById('quiz-screen').style.display = 'none';
+            document.getElementById('results-screen').style.display = 'none';
+            configScreen.style.display = 'block';
+            
+            console.log('Configuration screen should be visible now');
+        }
+        
+        // Start configured test
+        function startConfiguredTest() {
+            // Get configuration options
+            const startQuestion = parseInt(document.getElementById('start-question').value);
+            const endQuestion = parseInt(document.getElementById('end-question').value);
+            const shuffleQuestions = document.getElementById('shuffle-questions').checked;
+            const shuffleAnswers = document.getElementById('shuffle-answers').checked;
+            
+            // Validate inputs
+            if (startQuestion < 1 || startQuestion > currentTest.questions.length) {
+                alert('Invalid start question number');
+                return;
+            }
+            
+            if (endQuestion < startQuestion || endQuestion > currentTest.questions.length) {
+                alert('Invalid end question number');
+                return;
+            }
+            
+            // Create a copy of the test for modifications
+            const configuredTest = {...currentTest};
+            
+            // Filter questions based on range (convert from 1-based to 0-based indexing)
+            let filteredQuestions = currentTest.questions.slice(startQuestion - 1, endQuestion);
+            
+            // Shuffle questions if requested
+            if (shuffleQuestions) {
+                filteredQuestions = shuffleArray(filteredQuestions);
+            }
+            
+            // Shuffle answer options if requested
+            if (shuffleAnswers) {
+                filteredQuestions = filteredQuestions.map(question => {
+                    if (question.options && Array.isArray(question.options)) {
+                        // Create a copy of the question
+                        const questionCopy = {...question};
+                        
+                        // Track the correct answer
+                        const correctOption = question.options[question.correct_option];
+                        
+                        // Shuffle options
+                        questionCopy.options = shuffleArray([...question.options]);
+                        
+                        // Update correct_option index
+                        questionCopy.correct_option = questionCopy.options.indexOf(correctOption);
+                        
+                        return questionCopy;
+                    }
+                    return question;
+                });
+            }
+            
+            // Update the current test with filtered/shuffled questions
+            configuredTest.questions = filteredQuestions;
+            currentTest = configuredTest;
+            
+            // Reset state
+            currentQuestionIndex = 0;
+            userAnswers = new Array(currentTest.questions.length).fill(null);
+            
+            // Update UI
+            document.getElementById('total-questions').textContent = currentTest.questions.length;
+            document.getElementById('quiz-title').textContent = currentTest.name;
+            
+            // Show first question
+            showQuestion(0);
+            
+            // Show quiz screen
+            showScreen(document.getElementById('quiz-screen'));
+            
+            // Start timer
+            startTime = Date.now();
+            startTimer();
+        }
+        
+        // Utility function to shuffle an array
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
+        // Show a specific question
+        function showQuestion(index) {
+            if (index < 0 || index >= currentTest.questions.length) {
+                return;
+            }
+            
+            // Update current question index
+            currentQuestionIndex = index;
+            
+            // Update UI elements
+            document.getElementById('current-question').textContent = index + 1;
+            document.getElementById('total-questions').textContent = currentTest.questions.length;
+            document.getElementById('quiz-title').textContent = currentTest.name;
+            
+            // Update progress bar
+            const progress = ((index + 1) / currentTest.questions.length) * 100;
+            document.getElementById('progress-bar').style.width = `${progress}%`;
+            
+            // Get current question
+            const question = currentTest.questions[index];
+            
+            // Update question text (handle both formats: question.question or question.text)
+            document.getElementById('question-text').textContent = question.question || question.text || `Question ${index + 1}`;
+            
+            // Clear previous options
+            const answersContainer = document.getElementById('answers');
+            answersContainer.innerHTML = '';
+            
+            // Add options
+            if (question.options && Array.isArray(question.options)) {
+                question.options.forEach((option, optionIndex) => {
+                    const optionButton = document.createElement('button');
+                    optionButton.className = 'option-button';
+                    optionButton.textContent = option;
+                    
+                    // Check if this option was previously selected
+                    if (userAnswers[index] === optionIndex) {
+                        optionButton.classList.add('selected');
+                    }
+                    
+                    optionButton.addEventListener('click', () => {
+                        selectOption(optionIndex);
+                    });
+                    
+                    answersContainer.appendChild(optionButton);
+                });
+            } else {
+                // Handle case where options are missing
+                const noOptionsMessage = document.createElement('div');
+                noOptionsMessage.className = 'alert alert-warning';
+                noOptionsMessage.textContent = 'No options available for this question.';
+                answersContainer.appendChild(noOptionsMessage);
+            }
+            
+            // Update navigation buttons
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const finishBtn = document.getElementById('finish-btn');
+            
+            prevBtn.disabled = index === 0;
+            nextBtn.style.display = index < currentTest.questions.length - 1 ? 'inline-block' : 'none';
+            finishBtn.style.display = index === currentTest.questions.length - 1 ? 'inline-block' : 'none';
+        }
+        
+        // Select an option for the current question
+        function selectOption(optionIndex) {
+            try {
+                // Store the actual option index as the answer
+                userAnswers[currentQuestionIndex] = optionIndex;
+                
+                // Log the selection for debugging
+                console.log(`Question ${currentQuestionIndex + 1}: Selected option ${optionIndex}`);
+                
+                // Update UI to show selected option
+                document.querySelectorAll('.option-button').forEach((button, index) => {
+                    if (index === optionIndex) {
+                        button.classList.add('selected');
+                    } else {
+                        button.classList.remove('selected');
+                    }
+                });
+                
+                // Automatically move to next question after a short delay
+                if (currentQuestionIndex < currentTest.questions.length - 1) {
+                    setTimeout(() => {
+                        showQuestion(currentQuestionIndex + 1);
+                    }, 500);
+                }
+            } catch (error) {
+                console.error('Error in selectOption:', error);
+                // Continue without crashing
+            }
+        }
+
+        // Start the timer
+        function startTimer() {
+            clearInterval(timerInterval);
+            
+            timerInterval = setInterval(() => {
+                const elapsedSeconds = Math.floor((Date.now() - startTime) / 1000);
+                const minutes = Math.floor(elapsedSeconds / 60);
+                const seconds = elapsedSeconds % 60;
+                
+                document.getElementById('timer').textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+
+        // Stop the timer
+        function stopTimer() {
+            clearInterval(timerInterval);
+        }
+
+        // Submit test and show results
+        function submitTest() {
+            try {
+                console.log('Submitting test...');
+                stopTimer();
+                
+                // Verify user is authenticated
+                if (!currentUser || !currentUser.id) {
+                    console.error('No authenticated user found');
+                    alert(t.authError || 'Authentication error');
+                    showScreen('home-screen');
+                    return;
+                }
+                
+                // Verify the test belongs to the current user
+                if (currentTest.owner_id && currentTest.owner_id !== String(currentUser.id)) {
+                    console.error(`Test does not belong to the current user`);
+                    alert(t.testNotFound || 'Test not found');
+                    showScreen('home-screen');
+                    return;
+                }
+                
+                // Disable navigation during submission
+                document.getElementById('quiz-submit-btn').disabled = true;
+                document.getElementById('quiz-submit-btn').innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Submitting...'
+                
+                // Simple score calculation
+                let correctCount = 0;
+                const totalQuestions = currentTest.questions.length;
+                const answerResults = [];
+                
+                // Check each answer
+                for (let i = 0; i < currentTest.questions.length; i++) {
+                    const question = currentTest.questions[i];
+                    const userAnswer = userAnswers[i];
+                    
+                    // Skip questions that weren't answered
+                    if (userAnswer === undefined || userAnswer === null) {
+                        answerResults.push({
+                            question_index: i,
+                            user_answer: null,
+                            correct_answer: parseInt(question.correct_option),
+                            is_correct: false
+                        });
+                        continue;
+                    }
+                    
+                    // Parse user answer as integer
+                    const userAnswerInt = parseInt(userAnswer);
+                    
+                    // Handle the correct_option field - it might be missing or in different formats
+                    let correctAnswerInt = 0; // Default to first option if not specified
+                    
+                    if (question.hasOwnProperty('correct_option')) {
+                        // Try to parse as integer
+                        try {
+                            correctAnswerInt = parseInt(question.correct_option);
+                            // If NaN, use default value 0
+                            if (isNaN(correctAnswerInt)) {
+                                console.warn(`Invalid correct_option for question ${i+1}, using default (0)`);
+                                correctAnswerInt = 0;
+                            }
+                        } catch (e) {
+                            console.warn(`Error parsing correct_option for question ${i+1}: ${e}`);
+                            correctAnswerInt = 0;
+                        }
+                    } else {
+                        console.warn(`Missing correct_option for question ${i+1}, using default (0)`);
+                    }
+                    
+                    console.log(`Question ${i+1}: User answer: ${userAnswerInt}, Correct: ${correctAnswerInt}`);
+                    
+                    // Check if the answer is correct
+                    const isCorrect = userAnswerInt === correctAnswerInt;
+                    if (isCorrect) {
+                        correctCount++;
+                    }
+                    
+                    // Store result for this question
+                    answerResults.push({
+                        question_index: i,
+                        user_answer: userAnswerInt,
+                        correct_answer: correctAnswerInt,
+                        is_correct: isCorrect
+                    });
+                }
+                
+                // Calculate percentage
+                const percentage = totalQuestions > 0 ? (correctCount / totalQuestions) * 100 : 0;
+                console.log(`Score: ${correctCount}/${totalQuestions} (${percentage.toFixed(1)}%)`);
+                
+                // Calculate points (same as in the bot)
+                const points = Math.round(percentage);
+                
+                // Create score object
+                const scoreData = {
+                    correct: correctCount,
+                    total: totalQuestions,
+                    percentage: percentage,
+                    points: points,
+                    answer_results: answerResults
+                };
+                
+                // Try to send results to server
+                try {
+                    const userId = currentUser.id;
+                    console.log(`Sending results to server for user ${userId}...`);
+                    
+                    fetch('/api/submit_test', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            test_id: currentTest.id,
+                            answers: userAnswers,
+                            correct: correctCount,
+                            total: totalQuestions,
+                            percentage: percentage,
+                            answer_results: answerResults
+                        })
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`Server returned ${response.status} ${response.statusText}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Server response:', data);
+                        // Update score with server data if available
+                        if (data.success && data.score) {
+                            scoreData.correct = data.score.correct;
+                            scoreData.total = data.score.total;
+                            scoreData.percentage = data.score.percentage;
+                            scoreData.points = data.score.points;
+                            scoreData.saved_to_database = data.saved_to_database;
+                        }
+                        // Show results after server response
+                        showResults(scoreData);
+                    })
+                    .catch(e => {
+                        console.error('Server error:', e);
+                        // Show results anyway even if server failed
+                        showResults(scoreData);
+                    });
+                } catch (e) {
+                    console.error('Failed to send results to server:', e);
+                    // Show results even if there was an error
+                    showResults(scoreData);
+                }
+            } catch (error) {
+                console.error('Error submitting test:', error);
+                // Enable submit button again
+                const submitBtn = document.getElementById('quiz-submit-btn');
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = translations[currentLanguage]?.submit || 'Submit';
+                }
+                // Show a simple alert with the error
+                alert('An error occurred while submitting your test. Please try again.');
+            }
+        }
+
+        // Show test results
+        function showResults(score) {
+            try {
+                console.log('Showing results:', score);
+                
+                // Update the score elements
+                const scoreElement = document.getElementById('score');
+                const maxScoreElement = document.getElementById('max-score');
+                
+                if (scoreElement) scoreElement.textContent = score.correct;
+                if (maxScoreElement) maxScoreElement.textContent = score.total;
+                
+                // Get the translations for the current language
+                const t = translations[currentLanguage] || translations.en;
+                
+                // Calculate percentage (ensure it's a number)
+                const percentage = typeof score.percentage === 'number' ? score.percentage : 
+                                  (score.total > 0 ? (score.correct / score.total) * 100 : 0);
+                
+                // Create a progress bar
+                const barLength = 10;
+                const filledLength = Math.round((barLength * score.correct) / score.total);
+                const progressBar = '▓'.repeat(filledLength) + '░'.repeat(barLength - filledLength);
+                
+                // Set appropriate message and emoji based on score
+                let performanceEmoji = '🎯';
+                let resultMessageText = '';
+                
+                if (percentage >= 90) {
+                    performanceEmoji = '🏆';
+                    resultMessageText = t.excellent || 'Excellent! You did great!';
+                } else if (percentage >= 70) {
+                    performanceEmoji = '🌟';
+                    resultMessageText = t.goodJob || 'Good job! Well done!';
+                } else if (percentage >= 50) {
+                    performanceEmoji = '👍';
+                    resultMessageText = t.notBad || 'Not bad, but you can do better!';
+                } else {
+                    performanceEmoji = '📚';
+                    resultMessageText = t.needPractice || 'You need more practice!';
+                }
+                
+                // Update the results message
+                const resultMessage = document.getElementById('results-message');
+                if (resultMessage) {
+                    resultMessage.innerHTML = `
+                        <div class="result-header">
+                            <h3>${performanceEmoji} ${t.quizResults || 'QUIZ RESULTS'} ${performanceEmoji}</h3>
+                        </div>
+                        <div class="result-details">
+                            <p>📊 <b>${t.percentage || 'Percentage'}:</b> <code>${percentage.toFixed(1)}%</code></p>
+                            <p>${progressBar}</p>
+                            <p>💯 <b>${t.points || 'Points'}:</b> <code>${score.points || Math.round(percentage)}/100</code></p>
+                            <p class="result-motivation">${resultMessageText}</p>
+                        </div>
+                    `;
+                }
+                
+                // Update the you-scored-text with translation
+                const youScoredText = document.getElementById('you-scored-text');
+                if (youScoredText) {
+                    youScoredText.textContent = t.youScored || 'You scored';
+                }
+                
+                // Update the score-separator with translation
+                const scoreSeparator = document.getElementById('score-separator');
+                if (scoreSeparator) {
+                    scoreSeparator.textContent = t.outOf || '/';
+                }
+                
+                // Update button texts
+                const reviewBtn = document.getElementById('review-btn');
+                if (reviewBtn) {
+                    reviewBtn.textContent = t.review || 'Review Answers';
+                }
+                
+                const homeBtn = document.getElementById('home-btn');
+                if (homeBtn) {
+                    homeBtn.textContent = t.backToHome || 'Back to Home';
+                }
+                
+                // Show the results screen
+                showScreen(document.getElementById('results-screen'));
+                
+                // Add event listener to home button
+                if (homeBtn) {
+                    homeBtn.onclick = function() {
+                        showScreen(document.getElementById('home-screen'));
+                    };
+                }
+                
+                // Add event listener to review button
+                if (reviewBtn) {
+                    reviewBtn.onclick = function() {
+                        // Implement review functionality if needed
+                        alert('Review functionality not implemented yet');
+                    };
+                }
+                
+                // Try to send the results to Telegram if WebApp is available
+                if (window.Telegram && window.Telegram.WebApp) {
+                    try {
+                        const tg = window.Telegram.WebApp;
+                        // Send the results back to the bot
+                        const resultData = {
+                            action: 'test_completed',
+                            test_id: currentTest.id,
+                            test_name: currentTest.name,
+                            correct: score.correct,
+                            total: score.total,
+                            percentage: percentage,
+                            points: score.points || Math.round(percentage)
+                        };
+                        
+                        console.log('Sending data to Telegram:', resultData);
+                        tg.sendData(JSON.stringify(resultData));
+                        console.log('Sent results to Telegram bot');
+                        
+                        // Notify user that results were sent
+                        const resultNotification = document.createElement('div');
+                        resultNotification.className = 'alert alert-success mt-3';
+                        resultNotification.innerHTML = '<i class="bi bi-check-circle-fill"></i> Results saved to your Telegram bot';
+                        document.querySelector('.results-container').appendChild(resultNotification);
+                    } catch (e) {
+                        console.error('Error sending results to Telegram:', e);
+                        
+                        // Show error notification
+                        const errorNotification = document.createElement('div');
+                        errorNotification.className = 'alert alert-danger mt-3';
+                        errorNotification.innerHTML = '<i class="bi bi-exclamation-triangle-fill"></i> Failed to send results to Telegram';
+                        document.querySelector('.results-container').appendChild(errorNotification);
+                    }
+                }
+            } catch (error) {
+                console.error('Error showing results:', error);
+                alert('Quiz Results: ' + score.correct + '/' + score.total);
+                showScreen(document.getElementById('home-screen'));
+            }
+        }
+
+        // Show a specific screen
+        function showScreen(screen) {
+            console.log('Showing screen:', screen.id);
+            document.getElementById('home-screen').style.display = 'none';
+            document.getElementById('test-config-screen').style.display = 'none';
+            document.getElementById('quiz-screen').style.display = 'none';
+            document.getElementById('results-screen').style.display = 'none';
+            
+            screen.style.display = 'block';
+        }
+
+        // Stop the current test and return to home screen
+        function stopTest() {
+            console.log('Stop test button clicked');
+            const confirmMessage = translations[currentLanguage].stopConfirm || 'Are you sure you want to stop the test? Your progress will be lost.';
+            if (confirm(confirmMessage)) {
+                stopTimer();
+                showScreen(document.getElementById('home-screen'));
+            }
+        }
+        
+        // Function to set up all event listeners
+        function setupEventListeners() {
+            console.log('Setting up event listeners');
+            // Event listeners for navigation buttons
+            document.getElementById('prev-btn').addEventListener('click', () => {
+                showQuestion(currentQuestionIndex - 1);
+            });
+            
+            document.getElementById('next-btn').addEventListener('click', () => {
+                if (currentQuestionIndex === currentTest.questions.length - 1) {
+                    submitTest();
+                } else {
+                    showQuestion(currentQuestionIndex + 1);
+                }
+            });
+            
+            document.getElementById('finish-btn').addEventListener('click', () => {
+                submitTest();
+            });
+            
+            document.getElementById('stop-test-btn').addEventListener('click', () => {
+                stopTest();
+            });
+            
+            document.getElementById('review-btn').addEventListener('click', () => {
+                showScreen(document.getElementById('quiz-screen'));
+                showQuestion(0);
+            });
+            
+            document.getElementById('home-btn').addEventListener('click', () => {
+                showScreen(document.getElementById('home-screen'));
+            });
+            
+            // Test configuration buttons
+            document.getElementById('back-to-tests-btn').addEventListener('click', () => {
+                showScreen(document.getElementById('home-screen'));
+            });
+            
+            document.getElementById('start-configured-test-btn').addEventListener('click', () => {
+                startConfiguredTest();
+            });
+        }
+        
+        // Add event listeners after DOM is fully loaded
+        document.addEventListener('DOMContentLoaded', setupEventListeners);
+
+        // Initialize the app when the document is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize core functionality
+            initApp();
+            initializeLanguage();
+            initializeTheme();
+        });
+    </script>
+</body>
+</html>
